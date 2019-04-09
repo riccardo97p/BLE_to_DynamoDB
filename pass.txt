@@ -1,0 +1,1 @@
+your_AWS_DynamoDB_pool_id==>your_AWS_DynamoDB_pool_id
