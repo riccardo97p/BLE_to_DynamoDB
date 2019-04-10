@@ -26,7 +26,7 @@ import java.util.concurrent.CountDownLatch;
 public class AWSServiceClient {
 
     // amazon config
-    private static final String CUSTOMER_SPECIFIC_IOT_ENDPOINT = "YOUR_CLIENT_AWS_IOT";
+    private static final String CUSTOMER_SPECIFIC_IOT_ENDPOINT = "YOUR_AWS_IOT_ENDPOINT";
     AWSIotMqttManager mqttManager;
     String clientId;
 
