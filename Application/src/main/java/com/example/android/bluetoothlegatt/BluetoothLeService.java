@@ -32,6 +32,9 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,6 +45,7 @@ import java.util.UUID;
 public class BluetoothLeService extends Service {
 
     private AWSServiceClient AWSservice = AWSServiceClient.getInstance();
+    private List<Integer> measuraments = new ArrayList<>(5);
 
     private final static String TAG = BluetoothLeService.class.getSimpleName();
 
@@ -149,21 +153,54 @@ public class BluetoothLeService extends Service {
                 final StringBuilder stringBuilder = new StringBuilder(data.length);
 
                 int number = 0;
-                for(byte byteChar : data)
+                for (byte byteChar : data)
                     number = byteChar;
-                    //stringBuilder.append(String.format("%2x ", byteChar));
+                //stringBuilder.append(String.format("%2x ", byteChar));
 
-                String activity;
-                switch(number){//Integer.parse(stringBuilder.toString())) {
-                    case 1 : activity = "Staying still"; break;
+                measuraments.add(number);
+                String activity = "Unknown";
+                if (measuraments.size() == 5) {
+                    int stills = Collections.frequency(measuraments, 1);
+                    int sits = Collections.frequency(measuraments, 2);
+                    int walks = Collections.frequency(measuraments, 3);
+                    int runs = Collections.frequency(measuraments, 4);
+                    int max = Math.max(sits, Math.max(Math.max(stills, walks), runs));
 
-                    case 2 : activity = "Running"; break;
 
-                    case 3 : activity = "Walking"; break;
+                    if (max == stills)
+                        activity = "Staying still";
+                    if (max == runs)
+                        activity = "Running";
+                    if (max == walks)
+                        activity = "Walking";
+                    if (max == sits)
+                        activity = "Sitting";
+                    if (max == 0)
+                        activity = "Unknown";
 
-                    default : activity = "Unknown"; break;
+                    measuraments.clear();
+
+
+                    AWSServiceClient.getInstance().publish(activity);
                 }
-                AWSServiceClient.getInstance().publish(activity);
+
+                switch (number) {//Integer.parse(stringBuilder.toString())) {
+                    case 1:
+                        activity = "Staying still";
+                        break;
+                    case 2:
+                        activity = "Sitting";
+                        break;
+                    case 3:
+                        activity = "Walking";
+                        break;
+                    case 4:
+                        activity = "Running";
+                        break;
+                    default:
+                        activity = "Unknown";
+                        break;
+                }
                 intent.putExtra(EXTRA_DATA, new String(data) + "\n" + activity);
             }
         }
@@ -221,11 +258,10 @@ public class BluetoothLeService extends Service {
      * Connects to the GATT server hosted on the Bluetooth LE device.
      *
      * @param address The device address of the destination device.
-     *
      * @return Return true if the connection is initiated successfully. The connection result
-     *         is reported asynchronously through the
-     *         {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
-     *         callback.
+     * is reported asynchronously through the
+     * {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
+     * callback.
      */
     public boolean connect(final String address) {
         if (mBluetoothAdapter == null || address == null) {
@@ -319,10 +355,10 @@ public class BluetoothLeService extends Service {
 
         // This is specific to Heart Rate Measurement.
 
-            Log.d(TAG, "Data updated");
-            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CHARACTERISTIC_UPDATE_NOTIFICATION_DESCRIPTOR_UUID);
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            mBluetoothGatt.writeDescriptor(descriptor);
+        Log.d(TAG, "Data updated");
+        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CHARACTERISTIC_UPDATE_NOTIFICATION_DESCRIPTOR_UUID);
+        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+        mBluetoothGatt.writeDescriptor(descriptor);
 
     }
 
