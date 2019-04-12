@@ -6,8 +6,8 @@
   "CredentialsProvider": {
     "CognitoIdentity": {
       "Default": {
-        "PoolId": "us-east-1:YOUR_AWS_IoT_POOL_ID",
-        "Region": "us-east-1"
+        "PoolId": "YOUR_POOLID",
+        "Region": "YOUR_REGION"
       }
     }
   }
