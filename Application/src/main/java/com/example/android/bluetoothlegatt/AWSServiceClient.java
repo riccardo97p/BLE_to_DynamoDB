@@ -26,7 +26,7 @@ import java.util.concurrent.CountDownLatch;
 public class AWSServiceClient {
 
     // amazon config
-    private static final String CUSTOMER_SPECIFIC_IOT_ENDPOINT = "YOUR_AWS_IOT_ENDPOINT";
+    private static final String CUSTOMER_SPECIFIC_IOT_ENDPOINT = "YOUR_ENDPOINT";
     AWSIotMqttManager mqttManager;
     String clientId;
 
@@ -100,7 +100,7 @@ public class AWSServiceClient {
     }
 
     public void subscribe(final View view) {
-        final String topic = "my/iotminiproject";
+        final String topic = "YOUR_TOPIC";
 
         Log.d(TAG, "topic = " + topic);
 
